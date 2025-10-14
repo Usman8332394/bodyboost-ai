@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
+
 import { Calculator, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -14,7 +14,7 @@ const FitnessCalculator = () => {
   const [weight, setWeight] = useState("");
   const [heightUnit, setHeightUnit] = useState("cm");
   const [weightUnit, setWeightUnit] = useState("kg");
-  const [goal, setGoal] = useState("");
+  const [goal, setGoal] = useState("general-fitness");
   const [loading, setLoading] = useState(false);
   const [plan, setPlan] = useState("");
   const [bmi, setBmi] = useState("");
@@ -36,7 +36,7 @@ const FitnessCalculator = () => {
           weight: parseFloat(weight),
           heightUnit,
           weightUnit,
-          goal: goal || 'general fitness'
+          goal: goal.replace('-', ' ')
         }
       });
 
@@ -127,14 +127,20 @@ const FitnessCalculator = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="goal">Fitness Goal (Optional)</Label>
-                <Textarea
-                  id="goal"
-                  placeholder="E.g., lose weight, build muscle, improve endurance..."
-                  value={goal}
-                  onChange={(e) => setGoal(e.target.value)}
-                  rows={3}
-                />
+                <Label htmlFor="goal">Fitness Goal</Label>
+                <Select value={goal} onValueChange={setGoal}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select your fitness goal" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="weight-loss">Weight Loss</SelectItem>
+                    <SelectItem value="muscle-gain">Build Muscle</SelectItem>
+                    <SelectItem value="endurance">Improve Endurance</SelectItem>
+                    <SelectItem value="flexibility">Increase Flexibility</SelectItem>
+                    <SelectItem value="general-fitness">General Fitness</SelectItem>
+                    <SelectItem value="strength">Build Strength</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
               <Button 
@@ -169,10 +175,43 @@ const FitnessCalculator = () => {
                   <Loader2 className="h-8 w-8 animate-spin text-primary" />
                 </div>
               ) : plan ? (
-                <div className="prose prose-sm max-w-none">
-                  <div className="whitespace-pre-wrap text-sm leading-relaxed">
-                    {plan}
-                  </div>
+                <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2">
+                  {plan.split('\n\n').map((section, idx) => {
+                    const isHeading = section.match(/^(#+\s|[A-Z\s]+:|\d+\.\s[A-Z])/);
+                    const isBullet = section.match(/^[-•*]\s/);
+                    
+                    if (isHeading) {
+                      return (
+                        <div key={idx} className="pt-2 first:pt-0">
+                          <h3 className="text-lg font-bold text-primary mb-2">
+                            {section.replace(/^#+\s/, '')}
+                          </h3>
+                        </div>
+                      );
+                    }
+                    
+                    if (isBullet || section.includes('\n- ') || section.includes('\n• ')) {
+                      const items = section.split('\n').filter(s => s.trim());
+                      return (
+                        <ul key={idx} className="space-y-2 ml-2">
+                          {items.map((item, i) => (
+                            <li key={i} className="flex items-start gap-2">
+                              <span className="text-primary mt-1">•</span>
+                              <span className="text-sm leading-relaxed">
+                                {item.replace(/^[-•*]\s/, '')}
+                              </span>
+                            </li>
+                          ))}
+                        </ul>
+                      );
+                    }
+                    
+                    return (
+                      <p key={idx} className="text-sm leading-relaxed text-muted-foreground">
+                        {section}
+                      </p>
+                    );
+                  })}
                 </div>
               ) : (
                 <div className="flex items-center justify-center h-64 text-muted-foreground text-center">
