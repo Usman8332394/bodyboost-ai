@@ -91,7 +91,7 @@ const FitnessCalculator = () => {
           </p>
         </div>
 
-        <div className="max-w-4xl mx-auto grid md:grid-cols-2 gap-8">
+        <div className="max-w-4xl mx-auto space-y-8">
           <Card className="shadow-lg" style={{ boxShadow: 'var(--shadow-card)' }}>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -183,86 +183,88 @@ const FitnessCalculator = () => {
             </CardContent>
           </Card>
 
-          <Card className="shadow-lg" style={{ boxShadow: 'var(--shadow-card)' }}>
-            <CardHeader>
-              <CardTitle>Your Personalized Plan</CardTitle>
-              <CardDescription>
-                {bmi && `Your BMI: ${bmi}`}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {loading ? (
-                <div className="flex items-center justify-center h-64">
-                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                </div>
-              ) : plan ? (
-                <div className="space-y-6 max-h-[500px] overflow-y-auto pr-2">
-                  <p className="text-sm text-muted-foreground">{plan.summary}</p>
-                  
-                  <div>
-                    <h3 className="font-semibold mb-3">📋 Daily Meal Plan</h3>
-                    <div className="border rounded-lg overflow-hidden">
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead className="font-semibold">Meal</TableHead>
-                            <TableHead className="font-semibold">Time</TableHead>
-                            <TableHead className="font-semibold">Food</TableHead>
-                            <TableHead className="font-semibold">Cal</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {plan.dietPlan.map((row, index) => (
-                            <TableRow key={index}>
-                              <TableCell className="font-medium">{row.meal}</TableCell>
-                              <TableCell className="text-sm">{row.time}</TableCell>
-                              <TableCell className="text-sm">{row.food}</TableCell>
-                              <TableCell className="text-sm">{row.calories}</TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </div>
+          {(loading || plan) && (
+            <Card className="shadow-lg" style={{ boxShadow: 'var(--shadow-card)' }}>
+              <CardHeader>
+                <CardTitle className="text-2xl">Your Personalized Plan</CardTitle>
+                <CardDescription className="text-lg">
+                  {bmi && `Your BMI: ${bmi}`}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {loading ? (
+                  <div className="flex items-center justify-center h-64">
+                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
                   </div>
+                ) : plan ? (
+                  <div className="space-y-8">
+                    <p className="text-base text-muted-foreground leading-relaxed bg-secondary/30 p-4 rounded-lg">{plan.summary}</p>
+                    
+                    <div>
+                      <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                        <span className="text-2xl">📋</span> Daily Meal Plan
+                      </h3>
+                      <div className="border-2 rounded-lg overflow-hidden">
+                        <Table>
+                          <TableHeader>
+                            <TableRow className="bg-primary/5">
+                              <TableHead className="font-bold border-r">Meal</TableHead>
+                              <TableHead className="font-bold border-r">Time</TableHead>
+                              <TableHead className="font-bold border-r">Food</TableHead>
+                              <TableHead className="font-bold">Calories</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {plan.dietPlan.map((row, index) => (
+                              <TableRow key={index} className="border-b last:border-0">
+                                <TableCell className="font-semibold border-r">{row.meal}</TableCell>
+                                <TableCell className="border-r">{row.time}</TableCell>
+                                <TableCell className="border-r">{row.food}</TableCell>
+                                <TableCell className="font-medium">{row.calories}</TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </div>
+                    </div>
 
-                  <div>
-                    <h3 className="font-semibold mb-3">💪 Weekly Exercise Plan</h3>
-                    <div className="border rounded-lg overflow-hidden">
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead className="font-semibold">Day</TableHead>
-                            <TableHead className="font-semibold">Exercise</TableHead>
-                            <TableHead className="font-semibold">Sets</TableHead>
-                            <TableHead className="font-semibold">Reps</TableHead>
-                            <TableHead className="font-semibold">Rest</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {plan.exercisePlan.map((row, index) => (
-                            <TableRow key={index}>
-                              <TableCell className="font-medium text-sm">{row.day}</TableCell>
-                              <TableCell className="text-sm">{row.exercise}</TableCell>
-                              <TableCell className="text-sm">{row.sets}</TableCell>
-                              <TableCell className="text-sm">{row.reps}</TableCell>
-                              <TableCell className="text-sm">{row.rest}</TableCell>
+                    <div>
+                      <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                        <span className="text-2xl">💪</span> Weekly Exercise Plan
+                      </h3>
+                      <div className="border-2 rounded-lg overflow-hidden">
+                        <Table>
+                          <TableHeader>
+                            <TableRow className="bg-primary/5">
+                              <TableHead className="font-bold border-r">Day</TableHead>
+                              <TableHead className="font-bold border-r">Exercise</TableHead>
+                              <TableHead className="font-bold border-r">Sets</TableHead>
+                              <TableHead className="font-bold border-r">Reps</TableHead>
+                              <TableHead className="font-bold">Rest</TableHead>
                             </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
+                          </TableHeader>
+                          <TableBody>
+                            {plan.exercisePlan.map((row, index) => (
+                              <TableRow key={index} className="border-b last:border-0">
+                                <TableCell className="font-semibold border-r">{row.day}</TableCell>
+                                <TableCell className="border-r">{row.exercise}</TableCell>
+                                <TableCell className="border-r text-center">{row.sets}</TableCell>
+                                <TableCell className="border-r text-center">{row.reps}</TableCell>
+                                <TableCell className="text-center">{row.rest}</TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </div>
+                      <p className="text-sm text-muted-foreground mt-4 bg-primary/5 p-3 rounded-lg">
+                        💡 View all exercises with tutorial videos on the <a href="/exercises" className="text-primary underline font-semibold">Exercises page</a>
+                      </p>
                     </div>
-                    <p className="text-xs text-muted-foreground mt-2">
-                      💡 View all exercises with videos on the <a href="/exercises" className="text-primary underline">Exercises page</a>
-                    </p>
                   </div>
-                </div>
-              ) : (
-                <div className="flex items-center justify-center h-64 text-muted-foreground text-center">
-                  <p>Enter your details and click "Generate My Plan" to receive your personalized fitness and nutrition plan</p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+                ) : null}
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
     </section>
