@@ -4,10 +4,31 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Calculator, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+
+type DietRow = {
+  meal: string;
+  time: string;
+  food: string;
+  calories: string;
+};
+
+type ExerciseRow = {
+  day: string;
+  exercise: string;
+  sets: string;
+  reps: string;
+  rest: string;
+};
+
+type PlanData = {
+  dietPlan: DietRow[];
+  exercisePlan: ExerciseRow[];
+  summary: string;
+};
 
 const FitnessCalculator = () => {
   const [height, setHeight] = useState("");
@@ -16,7 +37,7 @@ const FitnessCalculator = () => {
   const [weightUnit, setWeightUnit] = useState("kg");
   const [goal, setGoal] = useState("general-fitness");
   const [loading, setLoading] = useState(false);
-  const [plan, setPlan] = useState("");
+  const [plan, setPlan] = useState<PlanData | null>(null);
   const [bmi, setBmi] = useState("");
 
   const handleGeneratePlan = async () => {
@@ -26,7 +47,7 @@ const FitnessCalculator = () => {
     }
 
     setLoading(true);
-    setPlan("");
+    setPlan(null);
     setBmi("");
 
     try {
@@ -175,43 +196,65 @@ const FitnessCalculator = () => {
                   <Loader2 className="h-8 w-8 animate-spin text-primary" />
                 </div>
               ) : plan ? (
-                <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2">
-                  {plan.split('\n\n').map((section, idx) => {
-                    const isHeading = section.match(/^(#+\s|[A-Z\s]+:|\d+\.\s[A-Z])/);
-                    const isBullet = section.match(/^[-•*]\s/);
-                    
-                    if (isHeading) {
-                      return (
-                        <div key={idx} className="pt-2 first:pt-0">
-                          <h3 className="text-lg font-bold text-primary mb-2">
-                            {section.replace(/^#+\s/, '')}
-                          </h3>
-                        </div>
-                      );
-                    }
-                    
-                    if (isBullet || section.includes('\n- ') || section.includes('\n• ')) {
-                      const items = section.split('\n').filter(s => s.trim());
-                      return (
-                        <ul key={idx} className="space-y-2 ml-2">
-                          {items.map((item, i) => (
-                            <li key={i} className="flex items-start gap-2">
-                              <span className="text-primary mt-1">•</span>
-                              <span className="text-sm leading-relaxed">
-                                {item.replace(/^[-•*]\s/, '')}
-                              </span>
-                            </li>
+                <div className="space-y-6 max-h-[500px] overflow-y-auto pr-2">
+                  <p className="text-sm text-muted-foreground">{plan.summary}</p>
+                  
+                  <div>
+                    <h3 className="font-semibold mb-3">📋 Daily Meal Plan</h3>
+                    <div className="border rounded-lg overflow-hidden">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead className="font-semibold">Meal</TableHead>
+                            <TableHead className="font-semibold">Time</TableHead>
+                            <TableHead className="font-semibold">Food</TableHead>
+                            <TableHead className="font-semibold">Cal</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {plan.dietPlan.map((row, index) => (
+                            <TableRow key={index}>
+                              <TableCell className="font-medium">{row.meal}</TableCell>
+                              <TableCell className="text-sm">{row.time}</TableCell>
+                              <TableCell className="text-sm">{row.food}</TableCell>
+                              <TableCell className="text-sm">{row.calories}</TableCell>
+                            </TableRow>
                           ))}
-                        </ul>
-                      );
-                    }
-                    
-                    return (
-                      <p key={idx} className="text-sm leading-relaxed text-muted-foreground">
-                        {section}
-                      </p>
-                    );
-                  })}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h3 className="font-semibold mb-3">💪 Weekly Exercise Plan</h3>
+                    <div className="border rounded-lg overflow-hidden">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead className="font-semibold">Day</TableHead>
+                            <TableHead className="font-semibold">Exercise</TableHead>
+                            <TableHead className="font-semibold">Sets</TableHead>
+                            <TableHead className="font-semibold">Reps</TableHead>
+                            <TableHead className="font-semibold">Rest</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {plan.exercisePlan.map((row, index) => (
+                            <TableRow key={index}>
+                              <TableCell className="font-medium text-sm">{row.day}</TableCell>
+                              <TableCell className="text-sm">{row.exercise}</TableCell>
+                              <TableCell className="text-sm">{row.sets}</TableCell>
+                              <TableCell className="text-sm">{row.reps}</TableCell>
+                              <TableCell className="text-sm">{row.rest}</TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-2">
+                      💡 View all exercises with videos on the <a href="/exercises" className="text-primary underline">Exercises page</a>
+                    </p>
+                  </div>
                 </div>
               ) : (
                 <div className="flex items-center justify-center h-64 text-muted-foreground text-center">

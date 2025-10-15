@@ -35,7 +35,34 @@ serve(async (req) => {
     const heightInM = heightInCm / 100;
     const bmi = (weightInKg / (heightInM * heightInM)).toFixed(1);
 
-    const systemPrompt = `You are an expert fitness coach and nutritionist. Create a personalized fitness and meal plan based on the user's metrics. Be specific, practical, and motivating.`;
+    const systemPrompt = `You are a certified fitness and nutrition expert. Generate personalized fitness and meal plans based on user data.
+
+IMPORTANT: You must ONLY use these exercises in the workout plan:
+- Push-ups
+- Squats
+- Plank
+- Jumping Jacks
+- Lunges
+- Burpees
+
+Return your response as a JSON object with this EXACT structure:
+{
+  "dietPlan": [
+    {"meal": "Breakfast", "time": "7:00 AM", "food": "meal description", "calories": "number"},
+    {"meal": "Mid-Morning Snack", "time": "10:00 AM", "food": "snack description", "calories": "number"},
+    {"meal": "Lunch", "time": "1:00 PM", "food": "meal description", "calories": "number"},
+    {"meal": "Evening Snack", "time": "4:00 PM", "food": "snack description", "calories": "number"},
+    {"meal": "Dinner", "time": "7:00 PM", "food": "meal description", "calories": "number"}
+  ],
+  "exercisePlan": [
+    {"day": "Monday", "exercise": "exercise name from allowed list", "sets": "number", "reps": "number or duration", "rest": "rest time"},
+    {"day": "Monday", "exercise": "exercise name from allowed list", "sets": "number", "reps": "number or duration", "rest": "rest time"},
+    ... more exercises for different days
+  ],
+  "summary": "Brief 2-3 sentence summary of the plan and expected results"
+}
+
+Provide 5 meals for diet plan and 5-7 exercises per week distributed across different days.`;
 
     const userPrompt = `Create a personalized fitness plan for someone with:
 - Height: ${height} ${heightUnit}
@@ -43,13 +70,12 @@ serve(async (req) => {
 - BMI: ${bmi}
 - Goal: ${goal || 'general fitness'}
 
-Provide:
-1. A brief fitness assessment
-2. A weekly exercise schedule (7 days) with specific exercises and duration
-3. A daily meal plan with breakfast, lunch, dinner, and snacks
-4. Key nutrition tips
+Create a comprehensive plan that includes:
+1. A daily meal plan with 5 meals (breakfast, mid-morning snack, lunch, evening snack, dinner) including timing, food items, and approximate calories
+2. A weekly exercise routine using ONLY the allowed exercises (Push-ups, Squats, Plank, Jumping Jacks, Lunges, Burpees) with sets, reps, and rest periods
+3. A brief summary of the plan
 
-Format the response in a clear, structured way with sections clearly marked.`;
+Ensure the plan is realistic, safe, and tailored to their BMI (${bmi}) and fitness goal.`;
 
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
@@ -63,6 +89,7 @@ Format the response in a clear, structured way with sections clearly marked.`;
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt }
         ],
+        response_format: { type: "json_object" }
       }),
     });
 
@@ -88,12 +115,12 @@ Format the response in a clear, structured way with sections clearly marked.`;
     }
 
     const data = await response.json();
-    const plan = data.choices[0].message.content;
+    const planData = JSON.parse(data.choices[0].message.content);
 
     console.log('Successfully generated plan');
 
     return new Response(
-      JSON.stringify({ plan, bmi }),
+      JSON.stringify({ plan: planData, bmi }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (error) {
