@@ -1,5 +1,6 @@
 import Navigation from "@/components/Navigation";
 import Hero from "@/components/Hero";
+import CalorieScanner from "@/components/CalorieScanner";
 import FitnessCalculator from "@/components/FitnessCalculator";
 
 const Index = () => {
@@ -7,6 +8,7 @@ const Index = () => {
     <div className="min-h-screen">
       <Navigation />
       <Hero />
+      <CalorieScanner />
       <FitnessCalculator />
     </div>
   );
