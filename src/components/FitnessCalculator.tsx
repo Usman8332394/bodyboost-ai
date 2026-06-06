@@ -42,8 +42,8 @@ const FitnessCalculator = () => {
   const [bmi, setBmi] = useState("");
 
   const handleGeneratePlan = async () => {
-    if (!height || !weight) {
-      toast.error("Please enter your height and weight");
+    if (!age || !height || !weight) {
+      toast.error("Please enter your age, height and weight");
       return;
     }
 
@@ -54,6 +54,7 @@ const FitnessCalculator = () => {
     try {
       const { data, error } = await supabase.functions.invoke('generate-fitness-plan', {
         body: {
+          age: parseInt(age),
           height: parseFloat(height),
           weight: parseFloat(weight),
           heightUnit,
