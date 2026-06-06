@@ -31,6 +31,7 @@ type PlanData = {
 };
 
 const FitnessCalculator = () => {
+  const [age, setAge] = useState("");
   const [height, setHeight] = useState("");
   const [weight, setWeight] = useState("");
   const [heightUnit, setHeightUnit] = useState("cm");
