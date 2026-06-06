@@ -31,6 +31,7 @@ type PlanData = {
 };
 
 const FitnessCalculator = () => {
+  const [age, setAge] = useState("");
   const [height, setHeight] = useState("");
   const [weight, setWeight] = useState("");
   const [heightUnit, setHeightUnit] = useState("cm");
@@ -41,8 +42,8 @@ const FitnessCalculator = () => {
   const [bmi, setBmi] = useState("");
 
   const handleGeneratePlan = async () => {
-    if (!height || !weight) {
-      toast.error("Please enter your height and weight");
+    if (!age || !height || !weight) {
+      toast.error("Please enter your age, height and weight");
       return;
     }
 
@@ -53,6 +54,7 @@ const FitnessCalculator = () => {
     try {
       const { data, error } = await supabase.functions.invoke('generate-fitness-plan', {
         body: {
+          age: parseInt(age),
           height: parseFloat(height),
           weight: parseFloat(weight),
           heightUnit,
@@ -101,6 +103,17 @@ const FitnessCalculator = () => {
               <CardDescription>Tell us about yourself</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
+              <div className="space-y-2">
+                <Label htmlFor="age">Age</Label>
+                <Input
+                  id="age"
+                  type="number"
+                  placeholder="Enter your age"
+                  value={age}
+                  onChange={(e) => setAge(e.target.value)}
+                />
+              </div>
+
               <div className="space-y-2">
                 <Label htmlFor="height">Height</Label>
                 <div className="flex gap-2">
