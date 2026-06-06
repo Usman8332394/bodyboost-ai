@@ -65,6 +65,7 @@ Return your response as a JSON object with this EXACT structure:
 Provide 5 meals for diet plan and 5-7 exercises per week distributed across different days.`;
 
     const userPrompt = `Create a personalized fitness plan for someone with:
+- Age: ${age || 'unknown'}
 - Height: ${height} ${heightUnit}
 - Weight: ${weight} ${weightUnit}
 - BMI: ${bmi}
@@ -75,7 +76,7 @@ Create a comprehensive plan that includes:
 2. A weekly exercise routine using ONLY the allowed exercises (Push-ups, Squats, Plank, Jumping Jacks, Lunges, Burpees) with sets, reps, and rest periods
 3. A brief summary of the plan
 
-Ensure the plan is realistic, safe, and tailored to their BMI (${bmi}) and fitness goal.`;
+Ensure the plan is realistic, safe, and tailored to their age (${age}), BMI (${bmi}), and fitness goal.`;
 
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
