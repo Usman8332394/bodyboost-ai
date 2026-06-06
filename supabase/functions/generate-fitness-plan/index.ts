@@ -12,9 +12,9 @@ serve(async (req) => {
   }
 
   try {
-    const { height, weight, heightUnit, weightUnit, goal } = await req.json();
+    const { age, height, weight, heightUnit, weightUnit, goal } = await req.json();
     
-    console.log('Received request:', { height, weight, heightUnit, weightUnit, goal });
+    console.log('Received request:', { age, height, weight, heightUnit, weightUnit, goal });
 
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     if (!LOVABLE_API_KEY) {
